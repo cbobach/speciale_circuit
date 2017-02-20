@@ -1,13 +1,24 @@
-#include "iostream"
+#define card_size 8 /* Need 8 bits to have 52 unique cards */
+#define num_cards 52 /* 4 shades each with 13 values */
+#define deck_size (card_size * num_cards) /* #bits used for 52 cards */
 
-uint8_t deck[52] = {0};
-uint8_t seed[52] = {0};
+typedef uint_t deck_size DECK
+typedef uint_t deck_size SEED
+typedef uint_t card_size uint8_t
 
+#parties 2
+
+#input 1 SEED
+#output 1 DECK
+#input 2 SEED
+#output 2 DECK
+
+/* Addition function used to implement subtraction */
 function uint8_t add(uint8_t m, uint8_t n) {
     uint8_t sum = m ^ n;
     uint8_t carry = m & n;
 
-    while (carry != 0) {
+    for (int i = 0; i < carry; i) {
         carry = carry << 1;
         m = sum;
         n = carry;
@@ -18,6 +29,7 @@ function uint8_t add(uint8_t m, uint8_t n) {
     return sum;
 }
 
+/* Subtraction used to implement modulo */
 function uint8_t sub(uint8_t m, uint8_t n) {
     uint8_t complement = (uint8_t) (n ^ 255);
     uint8_t x = add(complement, 1);
@@ -25,8 +37,9 @@ function uint8_t sub(uint8_t m, uint8_t n) {
     return add(m,x);
 }
 
+/* Modulo used to ensure that we shuffle cards correctly */
 function uint8_t mod(uint8_t n, uint8_t divisor) {
-    while (n > divisor) {
+    for (int i = 0; n > divisor ; i) {
         n = sub(n, divisor);
     }
 
@@ -37,19 +50,18 @@ function uint8_t mod(uint8_t n, uint8_t divisor) {
     return n;
 }
 
-
-function void XORSeed(SEED s1, SEED s2) {
-    for (int i = 0; i < sizeof(SEED); ++i) {
-        seed[i] = s1[i] ^ s2[i];
+function DECK shuffleDeck(SEED seed) {
+    /* Initialize deck to contain 1-52 in order */
+    DECK deck;
+    for (int j = 0; j < num_cards; ++j) {
+        deck[j] = (uint8_t) (j + 1);
     }
-}
 
-function void shuffleDeck() {
-    uint8_t s = 0;
+    /* Use the randomness from the seed to switch two cards in the deck */
     uint8_t card = 0;
-
-    for (int i = 0; i < sizeof(SEED); ++i) {
-        s = mod(seed[i], 52);
+    uint8_t s = 0;
+    for (int i = 0; i < num_cards; ++i) {
+        s = mod(seed[i], num_cards);
         card = deck[i];
         deck[i] = deck[s];
         deck[s] = card;
@@ -57,7 +69,10 @@ function void shuffleDeck() {
 }
 
 function void main() {
-    SEED s1, s2;
-    XORSeed(s1, s2);
-    shuffleDeck();
+    SEED seed = input1 ^ input2;
+
+    DECK deck = shuffleDeck(seed);
+
+    output1 = deck;
+    output2 = deck;
 }
