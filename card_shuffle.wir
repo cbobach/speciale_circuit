@@ -1,0 +1,63 @@
+#include "iostream"
+
+uint8_t deck[52] = {0};
+uint8_t seed[52] = {0};
+
+function uint8_t add(uint8_t m, uint8_t n) {
+    uint8_t sum = m ^ n;
+    uint8_t carry = m & n;
+
+    while (carry != 0) {
+        carry = carry << 1;
+        m = sum;
+        n = carry;
+        sum = m ^ n;
+        carry = m & n;
+    }
+
+    return sum;
+}
+
+function uint8_t sub(uint8_t m, uint8_t n) {
+    uint8_t complement = (uint8_t) (n ^ 255);
+    uint8_t x = add(complement, 1);
+
+    return add(m,x);
+}
+
+function uint8_t mod(uint8_t n, uint8_t divisor) {
+    while (n > divisor) {
+        n = sub(n, divisor);
+    }
+
+    if (n == divisor) {
+        n = sub(n, divisor);
+    }
+
+    return n;
+}
+
+
+function void XORSeed(SEED s1, SEED s2) {
+    for (int i = 0; i < sizeof(SEED); ++i) {
+        seed[i] = s1[i] ^ s2[i];
+    }
+}
+
+function void shuffleDeck() {
+    uint8_t s = 0;
+    uint8_t card = 0;
+
+    for (int i = 0; i < sizeof(SEED); ++i) {
+        s = mod(seed[i], 52);
+        card = deck[i];
+        deck[i] = deck[s];
+        deck[s] = card;
+    }
+}
+
+function void main() {
+    SEED s1, s2;
+    XORSeed(s1, s2);
+    shuffleDeck();
+}
