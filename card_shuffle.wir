@@ -2,9 +2,65 @@
 #define num_cards 52 /* 4 shades each with 13 values */
 #define deck_size (card_size * num_cards) /* #bits used for 52 cards */
 
-typedef uint_t deck_size DECK
-typedef uint_t deck_size SEED
 typedef uint_t card_size uint8_t
+
+struct deck {
+    unit8_t 1;
+    unit8_t 2;
+    unit8_t 3;
+    unit8_t 4;
+    unit8_t 5;
+    unit8_t 6;
+    unit8_t 7;
+    unit8_t 8;
+    unit8_t 9;
+    unit8_t 10;
+    unit8_t 11;
+    unit8_t 12;
+    unit8_t 13;
+    unit8_t 14;
+    unit8_t 15;
+    unit8_t 16;
+    unit8_t 17;
+    unit8_t 18;
+    unit8_t 19;
+    unit8_t 20;
+    unit8_t 21;
+    unit8_t 22;
+    unit8_t 23;
+    unit8_t 24;
+    unit8_t 25;
+    unit8_t 26;
+    unit8_t 27;
+    unit8_t 28;
+    unit8_t 29;
+    unit8_t 30;
+    unit8_t 31;
+    unit8_t 32;
+    unit8_t 33;
+    unit8_t 34;
+    unit8_t 35;
+    unit8_t 36;
+    unit8_t 37;
+    unit8_t 38;
+    unit8_t 39;
+    unit8_t 40;
+    unit8_t 41;
+    unit8_t 42;
+    unit8_t 43;
+    unit8_t 44;
+    unit8_t 45;
+    unit8_t 46;
+    unit8_t 47;
+    unit8_t 48;
+    unit8_t 49;
+    unit8_t 50;
+    unit8_t 51;
+    unit8_t 52;
+};
+
+typedef struct deck DECK
+typedef struct deck SEED
 
 #parties 2
 
@@ -13,66 +69,85 @@ typedef uint_t card_size uint8_t
 #input 2 SEED
 #output 2 DECK
 
-/* Addition function used to implement subtraction */
-function uint8_t add(uint8_t m, uint8_t n) {
-    uint8_t sum = m ^ n;
-    uint8_t carry = m & n;
+///* Addition function used to implement subtraction */
+//function uint8_t add(uint8_t m, uint8_t n) {
+//    uint8_t sum = m ^ n;
+//    uint8_t carry = m & n;
+//
+//    for (uint8_t i = 0; i < carry; i) {
+//        carry = carry << 1;
+//        m = sum;
+//        n = carry;
+//        sum = m ^ n;
+//        carry = m & n;
+//    }
+//
+//    return sum;
+//}
 
-    for (int i = 0; i < carry; i) {
-        carry = carry << 1;
-        m = sum;
-        n = carry;
-        sum = m ^ n;
-        carry = m & n;
+///* Subtraction used to implement modulo */
+//function uint8_t sub(uint8_t m, uint8_t n) {
+//    uint8_t complement = n ^ 255; /* 255 is 1111 1111 in base 2*/
+//    uint8_t x = add(complement, 1);
+//
+//    return add(m,x);
+//}
+
+///* Modulo used to ensure that we shuffle cards correctly */
+//function uint8_t mod(uint8_t n, uint8_t divisor) {
+//    for (uint8_t i = 0; n > divisor ; ++i) {
+//        n = sub(n, divisor);
+//    }
+//
+//    if (n == divisor) {
+//        n = sub(n, divisor);
+//    }
+//
+//    return n;
+//}
+
+function uint8_t[num_cards] init(SEED s1, SEED s2) {
+    SEED seed;
+
+    for (uint8_t i = 0; i < num_cards; ++i) {
+        seed.i = s1 ^ s2;
+        s1 = s1 >> card_size;
+        s2 = s2 >> card_size;
     }
 
-    return sum;
+    return seed;
 }
 
-/* Subtraction used to implement modulo */
-function uint8_t sub(uint8_t m, uint8_t n) {
-    uint8_t complement = (uint8_t) (n ^ 255);
-    uint8_t x = add(complement, 1);
 
-    return add(m,x);
-}
-
-/* Modulo used to ensure that we shuffle cards correctly */
-function uint8_t mod(uint8_t n, uint8_t divisor) {
-    for (int i = 0; n > divisor ; i) {
-        n = sub(n, divisor);
-    }
-
-    if (n == divisor) {
-        n = sub(n, divisor);
-    }
-
-    return n;
-}
-
-function DECK shuffleDeck(SEED seed) {
+function DECK shuffleDeck(uint8_t seed[num_cards]) {
     /* Initialize deck to contain 1-52 in order */
-    DECK deck;
-    for (int j = 0; j < num_cards; ++j) {
-        deck[j] = (uint8_t) (j + 1);
+    uint8_t d[num_cards];
+    for (uint8_t j = 0; j < num_cards; ++j) {
+        d[j] = j + 1;
     }
 
     /* Use the randomness from the seed to switch two cards in the deck */
     uint8_t card = 0;
     uint8_t s = 0;
-    for (int i = 0; i < num_cards; ++i) {
+    for (uint8_t i = 0; i < num_cards; ++i) {
         s = mod(seed[i], num_cards);
-        card = deck[i];
-        deck[i] = deck[s];
-        deck[s] = card;
+        card = d[i];
+        d[i] = d[s];
+        d[s] = card;
     }
+
+    /* Converte the array to a bit string */
+    DECK deck = 0;
+    for (uint8_t k = 0; k < num_cards; ++k) {
+        deck = deck << card_size;
+        deck = deck ^ d[k];
+    }
+
+    return deck;
 }
 
 function void main() {
-    SEED seed = input1 ^ input2;
-
-    DECK deck = shuffleDeck(seed);
-
-    output1 = deck;
-    output2 = deck;
+    uint8_t seed[52];
+    seed = init(input1, input2);
+    output1 = shuffleDeck(seed);
 }
