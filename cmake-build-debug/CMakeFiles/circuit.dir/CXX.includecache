@@ -7,6 +7,14 @@
 #IncludeRegexTransform: 
 
 /home/cbobach/speciale/circuit/main.cpp
+printf.h
+-
+bitset
+-
+iostream
+-
+stdlib.h
+-
 tiff.h
 /home/cbobach/speciale/circuit/tiff.h
 
