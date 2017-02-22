@@ -213,6 +213,138 @@ void printDeck(DECK deck) {
     printf("\n");
 }
 
+/*
+ * TOMORROW DO ADD, SUB, MOD IN ONE FUNCTION
+ * */
+
+
+/*
+uint8_t add(uint8_t n, uint8_t tmp) {
+    uint8_t sum = n ^ tmp;
+    uint8_t carry = n & tmp;
+
+    for (uint8_t i = 0; i < 8; ++i) {
+        carry = carry << 1;
+        n = sum;
+        tmp = carry;
+        sum = n ^ tmp;
+        carry = n & tmp;
+    }
+
+    return sum;
+}
+*/
+
+/*
+uint8_t sub(uint8_t n, uint8_t divisor) {
+    uint8_t complement = divisor ^ 255; */
+/* 255 in bits is 1111 1111 *//*
+
+    uint8_t one = 1;
+
+    */
+/* Calculating: complement + 1 *//*
+
+    uint8_t tmp = complement ^ one;
+    uint8_t carry = complement & one;
+
+    for (uint8_t i = 0; i < 8; ++i) {
+        carry = carry << 1;
+        complement = tmp;
+        one = carry;
+        tmp = complement ^ one;
+        carry = complement & one;
+    }
+
+    */
+/* Calculating: complement + 1 *//*
+
+
+    uint8_t sum = n ^ tmp;
+    carry = n & tmp;
+
+    for (uint8_t i = 0; i < 8; ++i) {
+        carry = carry << 1;
+        n = sum;
+        tmp = carry;
+        sum = n ^ tmp;
+        carry = n & tmp;
+    }
+
+    return sum;
+}
+*/
+
+uint8_t mod(uint8_t n, uint8_t divisor) {
+    for (uint8_t i = 0; i < 254 ; ++i) {
+        if (n >= divisor) {
+            uint8_t complement = divisor ^ 255; /* 255 in bits is 1111 1111 */
+            uint8_t one = 0;
+
+            /* Calculating: complement + 1 */
+            uint8_t tmp = complement ^ 1;
+            uint8_t carry = complement & 1;
+
+            for (uint8_t j = 0; j < 7; ++j) {
+                carry = carry << 1;
+                complement = tmp;
+                one = carry;
+                tmp = complement ^ one;
+                carry = complement & one;
+            }
+
+            /* Calculating: n + temp */
+            uint8_t sum = n ^ tmp;
+            carry = n & tmp;
+
+            for (uint8_t k = 0; k < 8; ++k) {
+                carry = carry << 1;
+                n = sum;
+                tmp = carry;
+                sum = n ^ tmp;
+                carry = n & tmp;
+            }
+        }
+    }
+
+    return n;
+}
+
+void testMod() {
+    printf("___TEST MOD___\n");
+    int s = 1;
+    int f = 0;
+
+    for (int i = 0; i < 255; ++i) {
+        for (int j = 1; j < 255; ++j) {
+            uint8_t a = mod(i, j);
+            uint8_t b = i % j;
+
+
+            if (a != b) {
+                char c = i ^ j;
+                char d = i & j;
+
+                s = 0;
+                std::bitset<8> x(a);
+                std::bitset<8> y(b);
+                std::bitset<8> z(c);
+                std::bitset<8> w(d);
+
+                std::cout << i << " + " << j << ": FAILED! was: " << x << ", should have been: " << y << ". "
+                          << "c: " << w << ", x: " << z << std::endl;
+                f++;
+            }
+        }
+    }
+
+    if (s == 1) {
+        printf("SUCCESS!\n\n");
+    } else {
+        printf("%u FAILED ATTEMPTS\n\n", f);
+    }
+}
+
 
 int main() {
     SEED input1 = {0}, input2 = {0};
@@ -222,8 +354,9 @@ int main() {
     DECK deck = {0}, output1 = {0}, output2 = {0};
     shuffleDeck(deck, seed);
 
-    printDeck(deck);
+//    printDeck(deck);
 
+    testMod();
     return 1;
 }
 
