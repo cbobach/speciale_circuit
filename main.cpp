@@ -11,6 +11,108 @@
 typedef uint8 DECK[num_cards];
 typedef uint8 SEED[num_cards];
 
+uint8_t geq52(uint8_t n) {
+    uint8_t res = 0;
+    uint8_t m = n & 60 ^ 52;
+    uint8_t o = n & 56 ^ 56;
+
+    if (m == 0) {
+        res = 1;
+    } else if (o == 0) {
+        res = 1;
+    } else {
+        res = 0;
+    }
+
+    return res;
+}
+
+uint8_t lt52(uint8_t n) {
+    uint8_t res = 0;
+    uint8_t m = n & 44;
+    uint8_t o = m >> 2;
+    uint8_t p = o & 27;
+
+    if (o == 0 && p == 0)
+        res = 1;
+
+    printf("%u: %u\n", n, o);
+
+    return res;
+}
+
+void testLT() {
+    printf("___TEST GEQ___\n");
+    int s = 1;
+    int f = 0;
+
+    for (int i = 0; i < 63; ++i) {
+        uint8_t a = lt52(i);
+        uint8_t b = 0;
+        if (i < 52)
+            b = 1;
+
+        if (a != b) {
+            s = 0;
+            std::bitset<8> x(a);
+            std::bitset<8> y(b);
+
+//            std::cout << i << " < 52: FAILED! was: " << x << ", should have been: " << y << ". " << std::endl;
+            f++;
+        }
+    }
+
+    if (s == 1) {
+        printf("SUCCESS!\n\n");
+    } else {
+        printf("%u FAILED ATTEMPTS\n\n", f);
+    }
+}
+
+void testGEQ() {
+    printf("___TEST GEQ___\n");
+    int s = 1;
+    int f = 0;
+
+    for (int i = 0; i < 63; ++i) {
+        uint8_t a = geq52(i);
+        uint8_t b = 0;
+        if (i >= 52)
+            b = 1;
+
+        if (a != b) {
+            s = 0;
+            std::bitset<8> x(a);
+            std::bitset<8> y(b);
+
+            std::cout << i << " >= 52: FAILED! was: " << x << ", should have been: " << y << ". " << std::endl;
+            f++;
+        }
+    }
+
+    if (s == 1) {
+        printf("SUCCESS!\n\n");
+    } else {
+        printf("%u FAILED ATTEMPTS\n\n", f);
+    }
+}
+
+
+int main() {
+    testGEQ();
+
+    return 1;
+}
+
+
+
+
+
+
+
+
+
+/*
 /*
 #parties 2
 
@@ -18,14 +120,12 @@ typedef uint8 SEED[num_cards];
 #output 1 DECK
 #input 2 SEED
 #output 2 DECK
-*/
 
 
 void initSeed(SEED s1, SEED s2, SEED seed) {
     for (uint8_t i = 0; i < num_cards; ++i) {
 /*
         seed[i] = s1[i] ^ s2[i];
-*/
         seed[i] = rand();
     }
 }
@@ -273,15 +373,14 @@ uint8_t sub(uint8_t n, uint8_t divisor) {
 
     return sum;
 }
-*/
 
 uint8_t mod(uint8_t n, uint8_t divisor) {
     for (uint8_t i = 0; i < 254 ; ++i) {
         if (n >= divisor) {
-            uint8_t complement = divisor ^ 255; /* 255 in bits is 1111 1111 */
+            uint8_t complement = divisor ^ 255; /* 255 in bits is 1111 1111
             uint8_t one = 0;
 
-            /* Calculating: complement + 1 */
+            /* Calculating: complement + 1
             uint8_t tmp = complement ^ 1;
             uint8_t carry = complement & 1;
 
@@ -293,7 +392,7 @@ uint8_t mod(uint8_t n, uint8_t divisor) {
                 carry = complement & one;
             }
 
-            /* Calculating: n + temp */
+            /* Calculating: n + temp
             uint8_t sum = n ^ tmp;
             carry = n & tmp;
 
@@ -345,30 +444,6 @@ void testMod() {
     }
 }
 
-
-int main() {
-    SEED input1 = {0}, input2 = {0};
-    SEED seed = {0};
-    initSeed(input1, input2, seed);
-
-    DECK deck = {0}, output1 = {0}, output2 = {0};
-    shuffleDeck(deck, seed);
-
-//    printDeck(deck);
-
-    testMod();
-    return 1;
-}
-
-
-
-
-
-
-
-
-
-/*
 const uint8_t NUM_CARDS = 52;
 
 typedef uint8_t DECK[NUM_CARDS];

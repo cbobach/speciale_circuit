@@ -1,10 +1,10 @@
-#define card_size 8 /* Need 8 bits to have 52 unique cards */
+#define card_size 6 /* Need 8 bits to have 52 unique cards */
 #define num_cards 52 /* 4 shades each with 13 values */
 #define deck_size (card_size * num_cards) /* #bits used for 52 cards */
 
 typedef uint_t deck_size DECK
 typedef uint_t deck_size SEED
-typedef uint_t card_size uint8_t
+typedef uint_t card_size CARD
 
 #parties 2
 
@@ -16,11 +16,11 @@ typedef uint_t card_size uint8_t
 /*
  * Reads randomness from inputs to seed array.
  */
-function uint8_t[num_cards] initSeed(SEED s1, SEED s2) {
+function CARD[num_cards] initSeed(SEED s1, SEED s2) {
     SEED s = s1 ^ s2;
-    uint8_t seed[num_cards];
+    CARD seed[num_cards];
 
-    for (uint8_t i = 0; i < num_cards; ++i) {
+    for (CARD i = 0; i < num_cards; ++i) {
         seed[i] = s{0:card_size};
         s = s >> card_size;
     }
@@ -28,17 +28,32 @@ function uint8_t[num_cards] initSeed(SEED s1, SEED s2) {
     return seed;
 }
 
+/*
+ * Moduloing seed to contain card values
+ */
+function CARD[num_cards] modSeed(CARD seed[num_cards]) {
+    for (CARD i = 0; i < num_cards; ++i) {
+        seed[i] = seed[i] | 32;
+        seed[i] = seed[i] % num_cards;
+    }
+
+    return seed;
+}
 
 /*
  * Initialize deck to contain 1-52.
  * Input seed is ignored. Used to trigger compiler to initialize
  * function usage.
  */
-function uint8_t[num_cards] initDeck(uint8_t _deck[num_cards]) {
-    uint8_t deck[num_cards];
+function CARD[num_cards] initDeck(CARD _[num_cards]) {
+    CARD deck[num_cards];
 
-    for (uint8_t i = 0; i < num_cards; ++i) {
-        deck[i] = i + 1;
+    for (CARD i = 0; i < num_cards; ++i) {
+        deck[i] = i + 53;
+
+        if (deck[i] < 53) {
+            deck[i] = 0;
+        }
     }
 
     return deck;
@@ -46,25 +61,25 @@ function uint8_t[num_cards] initDeck(uint8_t _deck[num_cards]) {
 
 
 /*
- * Finalizes deck from array to bitstring.
- */
-function DECK finalizeDeck(uint8_t d[num_cards]) {
+ * Finalizing output by writing array to bits
+ * */
+function DECK finalizeDeck(CARD d[num_cards]) {
     DECK deck = 0;
 
-    for (uint8_t i = 0; i < num_cards; ++i) {
-        uint8_t tmp = d[i];
+    for (CARD i = 0; i < num_cards; ++i) {
         deck = deck << card_size;
-        deck{0:card_size} = tmp;
+        deck{0:card_size} = d[i];
     }
 
     return deck;
 }
 
 function void main() {
-    uint8_t seed[num_cards];
+    CARD seed[num_cards];
     seed = initSeed(input1, input2);
+    seed = modSeed(seed);
 
-    uint8_t deck[num_cards];
+    CARD deck[num_cards];
     deck = initDeck(seed);
 
     output1 = finalizeDeck(seed);
