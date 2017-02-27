@@ -30,22 +30,6 @@ function CARD[num_out_cards] initSeed(SEED s1, SEED s2) {
 }
 
 /*
- * Moduloing seed to contain card values.
- *
- * !!! PROBLEM !!!
- * Does not give an uniform distribution of randomness, which is a problem.
- * We are more likely to draw a card with index 1-11.
- */
-function CARD[num_out_cards] modSeed(CARD seed[num_out_cards]) {
-    for (CARD i = 0; i < num_out_cards; ++i) {
-        seed[i] = seed[i] | 32;
-        seed[i] = seed[i] % num_cards;
-    }
-
-    return seed;
-}
-
-/*
  * Initialize deck to contain 1-52.
  * Input seed is ignored. Used to trigger compiler to initialize
  * function usage.
@@ -255,9 +239,6 @@ function DECK finalizeDeck(CARD d[num_cards]) {
 function void main() {
     CARD seed[num_out_cards];
     seed = initSeed(input1, input2);
-/*
-    seed = modSeed(seed);
-*/
 
     CARD deck[num_cards];
     deck = initDeck(seed);
