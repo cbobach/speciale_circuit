@@ -1,5 +1,6 @@
 #define card_size 6 /* Need 8 bits to have 52 unique cards */
 #define num_cards 52 /* 4 shades each with 13 values */
+#define num_out_cards 20
 #define deck_size (card_size * num_cards) /* #bits used for 52 cards */
 
 typedef uint_t card_size CARD
@@ -16,11 +17,11 @@ typedef uint_t deck_size SEED
 /*
  * Reads randomness from inputs to seed array.
  */
-function CARD[num_cards] initSeed(SEED s1, SEED s2) {
+function CARD[num_out_cards] initSeed(SEED s1, SEED s2) {
     SEED s = s1 ^ s2;
-    CARD seed[num_cards];
+    CARD seed[num_out_cards];
 
-    for (CARD i = 0; i < num_cards; ++i) {
+    for (CARD i = 0; i < num_out_cards; ++i) {
         seed[i] = s{0:card_size};
         s = s >> card_size;
     }
@@ -29,10 +30,14 @@ function CARD[num_cards] initSeed(SEED s1, SEED s2) {
 }
 
 /*
- * Moduloing seed to contain card values
+ * Moduloing seed to contain card values.
+ *
+ * !!! PROBLEM !!!
+ * Does not give an uniform distribution of randomness, which is a problem.
+ * We are more likely to draw a card with index 1-11.
  */
-function CARD[num_cards] modSeed(CARD seed[num_cards]) {
-    for (CARD i = 0; i < num_cards; ++i) {
+function CARD[num_out_cards] modSeed(CARD seed[num_out_cards]) {
+    for (CARD i = 0; i < num_out_cards; ++i) {
         seed[i] = seed[i] | 32;
         seed[i] = seed[i] % num_cards;
     }
@@ -45,7 +50,7 @@ function CARD[num_cards] modSeed(CARD seed[num_cards]) {
  * Input seed is ignored. Used to trigger compiler to initialize
  * function usage.
  */
-function CARD[num_cards] initDeck(CARD _[num_cards]) {
+function CARD[num_cards] initDeck(CARD _[num_out_cards]) {
     CARD deck[num_cards];
 
     for (CARD i = 0; i < num_cards; ++i) {
@@ -56,16 +61,18 @@ function CARD[num_cards] initDeck(CARD _[num_cards]) {
 }
 
 /*
- * Shuffelinf deck according to the seed
+ * Shuffling deck according to seed
  */
-function CARD[num_cards] shuffleDeck(CARD seed[num_cards], CARD deck[num_cards]) {
+function CARD[num_cards] shuffleDeck(CARD seed[num_out_cards], CARD deck[num_cards]) {
     CARD card = 0;
     CARD s = 0;
     
-    for (CARD i = 0; i < num_cards; ++i) {
+    for (CARD i = 0; i < num_out_cards; ++i) {
+        /*
+         * Statically swapping deck[i] and deck[s]
+         */
         s = seed[i];
         card = deck[i];
-
         if (s == 0) {
             deck[i] = deck[0];
             deck[0] = card;
@@ -73,7 +80,7 @@ function CARD[num_cards] shuffleDeck(CARD seed[num_cards], CARD deck[num_cards])
             deck[i] = deck[1];
             deck[1] = card;
         } else if (s == 2) {
-            deck[i] = deck[2];
+            deck[i] = deck[1];
             deck[2] = card;
         } else if (s == 3) {
             deck[i] = deck[3];
@@ -223,8 +230,7 @@ function CARD[num_cards] shuffleDeck(CARD seed[num_cards], CARD deck[num_cards])
             deck[i] = deck[51];
             deck[51] = card;
         } else {
-            deck[i] = deck[0];
-            deck[0] = card;
+            deck[i] = 63;
         }
     }
 
@@ -234,11 +240,11 @@ function CARD[num_cards] shuffleDeck(CARD seed[num_cards], CARD deck[num_cards])
 
 /*
  * Finalizing output by writing array to bits
- * */
+ */
 function DECK finalizeDeck(CARD d[num_cards]) {
     DECK deck = 0;
 
-    for (CARD i = 0; i < num_cards; ++i) {
+    for (CARD i = 0; i < num_out_cards; ++i) {
         deck = deck << card_size;
         deck{0:card_size} = d[i];
     }
@@ -247,9 +253,11 @@ function DECK finalizeDeck(CARD d[num_cards]) {
 }
 
 function void main() {
-    CARD seed[num_cards];
+    CARD seed[num_out_cards];
     seed = initSeed(input1, input2);
+/*
     seed = modSeed(seed);
+*/
 
     CARD deck[num_cards];
     deck = initDeck(seed);
