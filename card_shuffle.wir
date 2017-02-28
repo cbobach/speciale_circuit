@@ -1,12 +1,14 @@
-#define card_size 5 /* Need 8 bits to have 52 unique cards */
-#define num_cards 32 /* 4 shades each with 13 values */
-#define num_out_cards 20
-#define deck_size (card_size * num_cards) /* #bits used for 52 cards */
-#define out_deck_size (card_size * num_out_cards)
+#define card_size 5         /* Need 5 bits to have 32 unique cards */
+#define num_cards 32        /* 4 shades each with 8 values */
+#define num_out_cards 20    /* 20 cards needed for 5 draw poker */
+#define deck_size 160       /* 5 bits * 32 cards = 160 bits */
+#define out_deck_size 100   /* 5 bits * 20 cards = 100 bits */
+
+typedef uint_t 8 int
 
 typedef uint_t card_size CARD
 typedef uint_t deck_size DECK
-typedef uint_t deck_size SEED
+typedef uint_t out_deck_size SEED
 typedef uint_t out_deck_size OUT_DECK
 
 #parties 2
@@ -19,59 +21,50 @@ typedef uint_t out_deck_size OUT_DECK
 /*
  * Reads randomness from inputs to seed array.
  */
-function CARD[num_out_cards] initSeed(SEED s1, SEED s2) {
-    SEED s = s1 ^ s2;
-    CARD seed[num_out_cards];
-
-    for (CARD i = 0; i < num_out_cards; ++i) {
-        seed[i] = s{0:card_size};
-        s = s >> card_size;
-    }
-
-    return seed;
+function SEED initSeed(SEED s1, SEED s2) {
+    return s1 ^ s2;
 }
-
 
 /*
  * Initialize deck to contain 1-32.
  * Input seed is ignored. Used to trigger compiler to initialize
  * function usage.
  */
-function CARD[num_cards] initDeck(CARD _[num_out_cards]) {
-    CARD deck[num_cards];
+function DECK initDeck(SEED _) {
+    DECK deck = 0;
 
-    deck[0] = 0;
-    deck[1] = 1;
-    deck[2] = 2;
-    deck[3] = 3;
-    deck[4] = 4;
-    deck[5] = 5;
-    deck[6] = 6;
-    deck[7] = 7;
-    deck[8] = 8;
-    deck[9] = 9;
-    deck[10] = 10;
-    deck[11] = 11;
-    deck[12] = 12;
-    deck[13] = 13;
-    deck[14] = 14;
-    deck[15] = 15;
-    deck[16] = 16;
-    deck[17] = 17;
-    deck[18] = 18;
-    deck[19] = 19;
-    deck[20] = 20;
-    deck[21] = 21;
-    deck[22] = 22;
-    deck[23] = 23;
-    deck[24] = 24;
-    deck[25] = 25;
-    deck[26] = 26;
-    deck[27] = 27;
-    deck[28] = 28;
-    deck[29] = 29;
-    deck[30] = 30;
-    deck[31] = 31;
+    deck{0:card_size} = 0;
+    deck{5:card_size} = 1;
+    deck{10:card_size} = 2;
+    deck{15:card_size} = 3;
+    deck{20:card_size} = 4;
+    deck{25:card_size} = 5;
+    deck{30:card_size} = 6;
+    deck{35:card_size} = 7;
+    deck{40:card_size} = 8;
+    deck{45:card_size} = 9;
+    deck{50:card_size} = 10;
+    deck{55:card_size} = 11;
+    deck{60:card_size} = 12;
+    deck{65:card_size} = 13;
+    deck{70:card_size} = 14;
+    deck{75:card_size} = 15;
+    deck{80:card_size} = 16;
+    deck{85:card_size} = 17;
+    deck{90:card_size} = 18;
+    deck{95:card_size} = 19;
+    deck{100:card_size} = 20;
+    deck{105:card_size} = 21;
+    deck{110:card_size} = 22;
+    deck{115:card_size} = 23;
+    deck{120:card_size} = 24;
+    deck{125:card_size} = 25;
+    deck{130:card_size} = 26;
+    deck{135:card_size} = 27;
+    deck{140:card_size} = 28;
+    deck{145:card_size} = 29;
+    deck{150:card_size} = 30;
+    deck{155:card_size} = 31;
 
     return deck;
 }
@@ -79,7 +72,7 @@ function CARD[num_cards] initDeck(CARD _[num_out_cards]) {
 /*
  * Shuffling deck according to seed
  */
-function CARD[num_cards] shuffleDeck(CARD seed[num_out_cards], CARD deck[num_cards]) {
+function DECK shuffleDeck(SEED seed, DECK deck) {
     CARD card = 0;
     CARD s31 = 0;
     CARD s30 = 0;
@@ -114,177 +107,178 @@ function CARD[num_cards] shuffleDeck(CARD seed[num_out_cards], CARD deck[num_car
     CARD s1 = 0;
     CARD s0 = 0;
 
+    CARD pos = 0;
+    CARD pos2 = 0;
+
     for (CARD i = 0; i < num_out_cards; ++i) {
         /*
          * Statically swapping deck[i] and deck[s]
          */
-        s31 = seed[i] ^ 31;
-        s30 = seed[i] ^ 30;
-        s29 = seed[i] ^ 29;
-        s28 = seed[i] ^ 28;
-        s27 = seed[i] ^ 27;
-        s26 = seed[i] ^ 26;
-        s25 = seed[i] ^ 25;
-        s24 = seed[i] ^ 24;
-        s23 = seed[i] ^ 23;
-        s22 = seed[i] ^ 22;
-        s21 = seed[i] ^ 21;
-        s20 = seed[i] ^ 20;
-        s19 = seed[i] ^ 19;
-        s18 = seed[i] ^ 18;
-        s17 = seed[i] ^ 17;
-        s16 = seed[i] ^ 16;
-        s15 = seed[i] ^ 15;
-        s14 = seed[i] ^ 14;
-        s13 = seed[i] ^ 13;
-        s12 = seed[i] ^ 12;
-        s11 = seed[i] ^ 11;
-        s10 = seed[i] ^ 10;
-        s9 = seed[i] ^ 9;
-        s8 = seed[i] ^ 8;
-        s7 = seed[i] ^ 7;
-        s6 = seed[i] ^ 6;
-        s5 = seed[i] ^ 5;
-        s4 = seed[i] ^ 4;
-        s3 = seed[i] ^ 3;
-        s2 = seed[i] ^ 2;
-        s1 = seed[i] ^ 1;
-        s0 = seed[i] ^ 0;
+        pos = i * 5;
+        card = deck{pos:card_size};
 
-        card = deck[i];
+        s31 = seed{pos:card_size} ^ 31;
+        s30 = seed{pos:card_size} ^ 30;
+        s29 = seed{pos:card_size} ^ 29;
+        s28 = seed{pos:card_size} ^ 28;
+        s27 = seed{pos:card_size} ^ 27;
+        s26 = seed{pos:card_size} ^ 26;
+        s25 = seed{pos:card_size} ^ 25;
+        s24 = seed{pos:card_size} ^ 24;
+        s23 = seed{pos:card_size} ^ 23;
+        s22 = seed{pos:card_size} ^ 22;
+        s21 = seed{pos:card_size} ^ 21;
+        s20 = seed{pos:card_size} ^ 20;
+        s19 = seed{pos:card_size} ^ 19;
+        s18 = seed{pos:card_size} ^ 18;
+        s17 = seed{pos:card_size} ^ 17;
+        s16 = seed{pos:card_size} ^ 16;
+        s15 = seed{pos:card_size} ^ 15;
+        s14 = seed{pos:card_size} ^ 14;
+        s13 = seed{pos:card_size} ^ 13;
+        s12 = seed{pos:card_size} ^ 12;
+        s11 = seed{pos:card_size} ^ 11;
+        s10 = seed{pos:card_size} ^ 10;
+        s9 = seed{pos:card_size} ^ 9;
+        s8 = seed{pos:card_size} ^ 8;
+        s7 = seed{pos:card_size} ^ 7;
+        s6 = seed{pos:card_size} ^ 6;
+        s5 = seed{pos:card_size} ^ 5;
+        s4 = seed{pos:card_size} ^ 4;
+        s3 = seed{pos:card_size} ^ 3;
+        s2 = seed{pos:card_size} ^ 2;
+        s1 = seed{pos:card_size} ^ 1;
+        s0 = seed{pos:card_size} ^ 0;
+
 
         if (0 == s31) {
-            deck[i] = deck[31];
-            deck[31] = card;
+            deck{pos:card_size} = deck{155:card_size};
+            deck{155:card_size} = card;
         } else {
         if (0 == s30) {
-            deck[i] = deck[30];
-            deck[30] = card;
+            deck{pos:card_size} = deck{150:card_size};
+            deck{150:card_size} = card;
         } else {
         if (0 == s29) {
-            deck[i] = deck[29];
-            deck[29] = card;
+            deck{pos:card_size} = deck{145:card_size};
+            deck{145:card_size} = card;
         } else {
         if (0 == s28) {
-            deck[i] = deck[28];
-            deck[28] = card;
+            deck{pos:card_size} = deck{140:card_size};
+            deck{140:card_size} = card;
         } else {
         if (0 == s27) {
-            deck[i] = deck[27];
-            deck[27] = card;
+            deck{pos:card_size} = deck{135:card_size};
+            deck{135:card_size} = card;
         } else {
         if (0 == s26) {
-            deck[i] = deck[26];
-            deck[26] = card;
+            deck{pos:card_size} = deck{130:card_size};
+            deck{130:card_size} = card;
         } else {
         if (0 == s25) {
-            deck[i] = deck[25];
-            deck[25] = card;
+            deck{pos:card_size} = deck{125:card_size};
+            deck{125:card_size} = card;
         } else {
         if (0 == s24) {
-            deck[i] = deck[24];
-            deck[24] = card;
+            deck{pos:card_size} = deck{120:card_size};
+            deck{120:card_size} = card;
         } else {
         if (0 == s23) {
-            deck[i] = deck[23];
-            deck[23] = card;
+            deck{pos:card_size} = deck{115:card_size};
+            deck{115:card_size} = card;
         } else {
         if (0 == s22) {
-            deck[i] = deck[22];
-            deck[22] = card;
+            deck{pos:card_size} = deck{110:card_size};
+            deck{110:card_size} = card;
         } else {
         if (0 == s21) {
-            deck[i] = deck[21];
-            deck[21] = card;
+            deck{pos:card_size} = deck{105:card_size};
+            deck{105:card_size} = card;
         } else {
         if (0 == s20) {
-            deck[i] = deck[20];
-            deck[20] = card;
+            deck{pos:card_size} = deck{100:card_size};
+            deck{100:card_size} = card;
         } else {
         if (0 == s19) {
-            deck[i] = deck[19];
-            deck[19] = card;
+            deck{pos:card_size} = deck{95:card_size};
+            deck{95:card_size} = card;
         } else {
         if (0 == s18) {
-            deck[i] = deck[18];
-            deck[18] = card;
+            deck{pos:card_size} = deck{90:card_size};
+            deck{90:card_size} = card;
         } else {
         if (0 == s17) {
-            deck[i] = deck[17];
-            deck[17] = card;
+            deck{pos:card_size} = deck{85:card_size};
+            deck{85:card_size} = card;
         } else {
         if (0 == s16) {
-            deck[i] = deck[16];
-            deck[16] = card;
-        } else {
-        if (0 == s16) {
-            deck[i] = deck[16];
-            deck[16] = card;
+            deck{pos:card_size} = deck{80:card_size};
+            deck{80:card_size} = card;
         } else {
         if (0 == s15) {
-            deck[i] = deck[15];
-            deck[15] = card;
+            deck{pos:card_size} = deck{75:card_size};
+            deck{75:card_size} = card;
         } else {
         if (0 == s14) {
-            deck[i] = deck[14];
-            deck[14] = card;
+            deck{pos:card_size} = deck{70:card_size};
+            deck{70:card_size} = card;
         } else {
         if (0 == s13) {
-            deck[i] = deck[13];
-            deck[13] = card;
+            deck{pos:card_size} = deck{65:card_size};
+            deck{65:card_size} = card;
         } else {
         if (0 == s12) {
-            deck[i] = deck[12];
-            deck[12] = card;
+            deck{pos:card_size} = deck{60:card_size};
+            deck{60:card_size} = card;
         } else {
         if (0 == s11) {
-            deck[i] = deck[11];
-            deck[11] = card;
+            deck{pos:card_size} = deck{55:card_size};
+            deck{55:card_size} = card;
         } else {
         if (0 == s10) {
-            deck[i] = deck[10];
-            deck[10] = card;
+            deck{pos:card_size} = deck{50:card_size};
+            deck{50:card_size} = card;
         } else {
         if (0 == s9) {
-            deck[i] = deck[9];
-            deck[9] = card;
+            deck{pos:card_size} = deck{45:card_size};
+            deck{45:card_size} = card;
         } else {
         if (0 == s8) {
-            deck[i] = deck[8];
-            deck[8] = card;
+            deck{pos:card_size} = deck{40:card_size};
+            deck{40:card_size} = card;
         } else {
         if (0 == s7) {
-            deck[i] = deck[7];
-            deck[7] = card;
+            deck{pos:card_size} = deck{35:card_size};
+            deck{35:card_size} = card;
         } else {
         if (0 == s6) {
-            deck[i] = deck[6];
-            deck[6] = card;
+            deck{pos:card_size} = deck{30:card_size};
+            deck{30:card_size} = card;
         } else {
         if (0 == s5) {
-            deck[i] = deck[5];
-            deck[5] = card;
+            deck{pos:card_size} = deck{25:card_size};
+            deck{25:card_size} = card;
         } else {
         if (0 == s4) {
-            deck[i] = deck[4];
-            deck[4] = card;
+            deck{pos:card_size} = deck{20:card_size};
+            deck{20:card_size} = card;
         } else {
         if (0 == s3) {
-            deck[i] = deck[3];
-            deck[3] = card;
+            deck{pos:card_size} = deck{15:card_size};
+            deck{15:card_size} = card;
         } else {
         if (0 == s2) {
-            deck[i] = deck[2];
-            deck[2] = card;
+            deck{pos:card_size} = deck{10:card_size};
+            deck{10:card_size} = card;
         } else {
         if (0 == s1) {
-            deck[i] = deck[1];
-            deck[1] = card;
+            deck{pos:card_size} = deck{5:card_size};
+            deck{5:card_size} = card;
         } else {
         if (0 == s0) {
-            deck[i] = deck[0];
-            deck[0] = card;
-        }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
+            deck{pos:card_size} = deck{0:card_size};
+            deck{0:card_size} = card;
+        }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
     }
 
     return deck;
@@ -294,22 +288,15 @@ function CARD[num_cards] shuffleDeck(CARD seed[num_out_cards], CARD deck[num_car
 /*
  * Finalizing output by writing array to bits
  */
-function OUT_DECK finalizeDeck(CARD d[num_cards]) {
-    OUT_DECK deck = 0;
-
-    for (CARD i = 0; i < num_out_cards; ++i) {
-        deck = deck << card_size;
-        deck{0:card_size} = d[i];
-    }
-
-    return deck;
+function OUT_DECK finalizeDeck(DECK deck) {
+    return deck{0:out_deck_size};
 }
 
 function void main() {
-    CARD seed[num_out_cards];
+    SEED seed;
     seed = initSeed(input1, input2);
 
-    CARD deck[num_cards];
+    DECK deck;
     deck = initDeck(seed);
     deck = shuffleDeck(seed, deck);
 
