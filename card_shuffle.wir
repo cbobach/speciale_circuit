@@ -1,18 +1,20 @@
-#define card_size 6 /* Need 8 bits to have 52 unique cards */
-#define num_cards 52 /* 4 shades each with 13 values */
+#define card_size 5 /* Need 8 bits to have 52 unique cards */
+#define num_cards 32 /* 4 shades each with 13 values */
 #define num_out_cards 20
 #define deck_size (card_size * num_cards) /* #bits used for 52 cards */
+#define out_deck_size (card_size * num_out_cards)
 
 typedef uint_t card_size CARD
 typedef uint_t deck_size DECK
 typedef uint_t deck_size SEED
+typedef uint_t out_deck_size OUT_DECK
 
 #parties 2
 
 #input 1 SEED
-#output 1 DECK
+#output 1 OUT_DECK
 #input 2 SEED
-#output 2 DECK
+#output 2 OUT_DECK
 
 /*
  * Reads randomness from inputs to seed array.
@@ -29,17 +31,47 @@ function CARD[num_out_cards] initSeed(SEED s1, SEED s2) {
     return seed;
 }
 
+
 /*
- * Initialize deck to contain 1-52.
+ * Initialize deck to contain 1-32.
  * Input seed is ignored. Used to trigger compiler to initialize
  * function usage.
  */
 function CARD[num_cards] initDeck(CARD _[num_out_cards]) {
     CARD deck[num_cards];
 
-    for (CARD i = 0; i < num_cards; ++i) {
-        deck[i] = i + 1;
-    }
+    deck[0] = 0;
+    deck[1] = 1;
+    deck[2] = 2;
+    deck[3] = 3;
+    deck[4] = 4;
+    deck[5] = 5;
+    deck[6] = 6;
+    deck[7] = 7;
+    deck[8] = 8;
+    deck[9] = 9;
+    deck[10] = 10;
+    deck[11] = 11;
+    deck[12] = 12;
+    deck[13] = 13;
+    deck[14] = 14;
+    deck[15] = 15;
+    deck[16] = 16;
+    deck[17] = 17;
+    deck[18] = 18;
+    deck[19] = 19;
+    deck[20] = 20;
+    deck[21] = 21;
+    deck[22] = 22;
+    deck[23] = 23;
+    deck[24] = 24;
+    deck[25] = 25;
+    deck[26] = 26;
+    deck[27] = 27;
+    deck[28] = 28;
+    deck[29] = 29;
+    deck[30] = 30;
+    deck[31] = 31;
 
     return deck;
 }
@@ -49,173 +81,210 @@ function CARD[num_cards] initDeck(CARD _[num_out_cards]) {
  */
 function CARD[num_cards] shuffleDeck(CARD seed[num_out_cards], CARD deck[num_cards]) {
     CARD card = 0;
-    CARD s = 0;
-    
+    CARD s31 = 0;
+    CARD s30 = 0;
+    CARD s29 = 0;
+    CARD s28 = 0;
+    CARD s27 = 0;
+    CARD s26 = 0;
+    CARD s25 = 0;
+    CARD s24 = 0;
+    CARD s23 = 0;
+    CARD s22 = 0;
+    CARD s21 = 0;
+    CARD s20 = 0;
+    CARD s19 = 0;
+    CARD s18 = 0;
+    CARD s17 = 0;
+    CARD s16 = 0;
+    CARD s15 = 0;
+    CARD s14 = 0;
+    CARD s13 = 0;
+    CARD s12 = 0;
+    CARD s11 = 0;
+    CARD s10 = 0;
+    CARD s9 = 0;
+    CARD s8 = 0;
+    CARD s7 = 0;
+    CARD s6 = 0;
+    CARD s5 = 0;
+    CARD s4 = 0;
+    CARD s3 = 0;
+    CARD s2 = 0;
+    CARD s1 = 0;
+    CARD s0 = 0;
+
     for (CARD i = 0; i < num_out_cards; ++i) {
         /*
          * Statically swapping deck[i] and deck[s]
          */
-        s = seed[i];
+        s31 = seed[i] ^ 31;
+        s30 = seed[i] ^ 30;
+        s29 = seed[i] ^ 29;
+        s28 = seed[i] ^ 28;
+        s27 = seed[i] ^ 27;
+        s26 = seed[i] ^ 26;
+        s25 = seed[i] ^ 25;
+        s24 = seed[i] ^ 24;
+        s23 = seed[i] ^ 23;
+        s22 = seed[i] ^ 22;
+        s21 = seed[i] ^ 21;
+        s20 = seed[i] ^ 20;
+        s19 = seed[i] ^ 19;
+        s18 = seed[i] ^ 18;
+        s17 = seed[i] ^ 17;
+        s16 = seed[i] ^ 16;
+        s15 = seed[i] ^ 15;
+        s14 = seed[i] ^ 14;
+        s13 = seed[i] ^ 13;
+        s12 = seed[i] ^ 12;
+        s11 = seed[i] ^ 11;
+        s10 = seed[i] ^ 10;
+        s9 = seed[i] ^ 9;
+        s8 = seed[i] ^ 8;
+        s7 = seed[i] ^ 7;
+        s6 = seed[i] ^ 6;
+        s5 = seed[i] ^ 5;
+        s4 = seed[i] ^ 4;
+        s3 = seed[i] ^ 3;
+        s2 = seed[i] ^ 2;
+        s1 = seed[i] ^ 1;
+        s0 = seed[i] ^ 0;
+
         card = deck[i];
-        if (s == 0) {
-            deck[i] = deck[0];
-            deck[0] = card;
-        } else if (s == 1) {
-            deck[i] = deck[1];
-            deck[1] = card;
-        } else if (s == 2) {
-            deck[i] = deck[1];
-            deck[2] = card;
-        } else if (s == 3) {
-            deck[i] = deck[3];
-            deck[3] = card;
-        } else if (s == 4) {
-            deck[i] = deck[4];
-            deck[4] = card;
-        } else if (s == 5) {
-            deck[i] = deck[5];
-            deck[5] = card;
-        } else if (s == 6) {
-            deck[i] = deck[6];
-            deck[6] = card;
-        } else if (s == 7) {
-            deck[i] = deck[7];
-            deck[7] = card;
-        } else if (s == 8) {
-            deck[i] = deck[8];
-            deck[8] = card;
-        } else if (s == 9) {
-            deck[i] = deck[9];
-            deck[9] = card;
-        } else if (s == 10) {
-            deck[i] = deck[10];
-            deck[10] = card;
-        } else if (s == 11) {
-            deck[i] = deck[11];
-            deck[11] = card;
-        } else if (s == 12) {
-            deck[i] = deck[12];
-            deck[12] = card;
-        } else if (s == 13) {
-            deck[i] = deck[13];
-            deck[13] = card;
-        } else if (s == 14) {
-            deck[i] = deck[14];
-            deck[14] = card;
-        } else if (s == 15) {
-            deck[i] = deck[15];
-            deck[15] = card;
-        } else if (s == 16) {
-            deck[i] = deck[16];
-            deck[16] = card;
-        } else if (s == 17) {
-            deck[i] = deck[17];
-            deck[17] = card;
-        } else if (s == 18) {
-            deck[i] = deck[18];
-            deck[18] = card;
-        } else if (s == 19) {
-            deck[i] = deck[19];
-            deck[19] = card;
-        } else if (s == 20) {
-            deck[i] = deck[20];
-            deck[20] = card;
-        } else if (s == 21) {
-            deck[i] = deck[21];
-            deck[21] = card;
-        } else if (s == 22) {
-            deck[i] = deck[22];
-            deck[22] = card;
-        } else if (s == 23) {
-            deck[i] = deck[23];
-            deck[23] = card;
-        } else if (s == 24) {
-            deck[i] = deck[24];
-            deck[24] = card;
-        } else if (s == 25) {
-            deck[i] = deck[25];
-            deck[25] = card;
-        } else if (s == 26) {
-            deck[i] = deck[26];
-            deck[26] = card;
-        } else if (s == 27) {
-            deck[i] = deck[27];
-            deck[27] = card;
-        } else if (s == 28) {
-            deck[i] = deck[28];
-            deck[28] = card;
-        } else if (s == 29) {
-            deck[i] = deck[29];
-            deck[29] = card;
-        } else if (s == 30) {
-            deck[i] = deck[30];
-            deck[30] = card;
-        } else if (s == 31) {
+
+        if (0 == s31) {
             deck[i] = deck[31];
             deck[31] = card;
-        } else if (s == 32) {
-            deck[i] = deck[32];
-            deck[32] = card;
-        } else if (s == 33) {
-            deck[i] = deck[33];
-            deck[33] = card;
-        } else if (s == 34) {
-            deck[i] = deck[34];
-            deck[34] = card;
-        } else if (s == 35) {
-            deck[i] = deck[35];
-            deck[35] = card;
-        } else if (s == 36) {
-            deck[i] = deck[36];
-            deck[36] = card;
-        } else if (s == 37) {
-            deck[i] = deck[37];
-            deck[37] = card;
-        } else if (s == 38) {
-            deck[i] = deck[38];
-            deck[38] = card;
-        } else if (s == 39) {
-            deck[i] = deck[39];
-            deck[39] = card;
-        } else if (s == 40) {
-            deck[i] = deck[40];
-            deck[40] = card;
-        } else if (s == 41) {
-            deck[i] = deck[41];
-            deck[41] = card;
-        } else if (s == 42) {
-            deck[i] = deck[42];
-            deck[42] = card;
-        } else if (s == 43) {
-            deck[i] = deck[43];
-            deck[43] = card;
-        } else if (s == 44) {
-            deck[i] = deck[44];
-            deck[44] = card;
-        } else if (s == 45) {
-            deck[i] = deck[45];
-            deck[45] = card;
-        } else if (s == 46) {
-            deck[i] = deck[46];
-            deck[46] = card;
-        } else if (s == 47) {
-            deck[i] = deck[47];
-            deck[47] = card;
-        } else if (s == 48) {
-            deck[i] = deck[48];
-            deck[48] = card;
-        } else if (s == 49) {
-            deck[i] = deck[49];
-            deck[49] = card;
-        } else if (s == 50) {
-            deck[i] = deck[50];
-            deck[50] = card;
-        } else if (s == 51) {
-            deck[i] = deck[51];
-            deck[51] = card;
         } else {
-            deck[i] = 63;
-        }
+        if (0 == s30) {
+            deck[i] = deck[30];
+            deck[30] = card;
+        } else {
+        if (0 == s29) {
+            deck[i] = deck[29];
+            deck[29] = card;
+        } else {
+        if (0 == s28) {
+            deck[i] = deck[28];
+            deck[28] = card;
+        } else {
+        if (0 == s27) {
+            deck[i] = deck[27];
+            deck[27] = card;
+        } else {
+        if (0 == s26) {
+            deck[i] = deck[26];
+            deck[26] = card;
+        } else {
+        if (0 == s25) {
+            deck[i] = deck[25];
+            deck[25] = card;
+        } else {
+        if (0 == s24) {
+            deck[i] = deck[24];
+            deck[24] = card;
+        } else {
+        if (0 == s23) {
+            deck[i] = deck[23];
+            deck[23] = card;
+        } else {
+        if (0 == s22) {
+            deck[i] = deck[22];
+            deck[22] = card;
+        } else {
+        if (0 == s21) {
+            deck[i] = deck[21];
+            deck[21] = card;
+        } else {
+        if (0 == s20) {
+            deck[i] = deck[20];
+            deck[20] = card;
+        } else {
+        if (0 == s19) {
+            deck[i] = deck[19];
+            deck[19] = card;
+        } else {
+        if (0 == s18) {
+            deck[i] = deck[18];
+            deck[18] = card;
+        } else {
+        if (0 == s17) {
+            deck[i] = deck[17];
+            deck[17] = card;
+        } else {
+        if (0 == s16) {
+            deck[i] = deck[16];
+            deck[16] = card;
+        } else {
+        if (0 == s16) {
+            deck[i] = deck[16];
+            deck[16] = card;
+        } else {
+        if (0 == s15) {
+            deck[i] = deck[15];
+            deck[15] = card;
+        } else {
+        if (0 == s14) {
+            deck[i] = deck[14];
+            deck[14] = card;
+        } else {
+        if (0 == s13) {
+            deck[i] = deck[13];
+            deck[13] = card;
+        } else {
+        if (0 == s12) {
+            deck[i] = deck[12];
+            deck[12] = card;
+        } else {
+        if (0 == s11) {
+            deck[i] = deck[11];
+            deck[11] = card;
+        } else {
+        if (0 == s10) {
+            deck[i] = deck[10];
+            deck[10] = card;
+        } else {
+        if (0 == s9) {
+            deck[i] = deck[9];
+            deck[9] = card;
+        } else {
+        if (0 == s8) {
+            deck[i] = deck[8];
+            deck[8] = card;
+        } else {
+        if (0 == s7) {
+            deck[i] = deck[7];
+            deck[7] = card;
+        } else {
+        if (0 == s6) {
+            deck[i] = deck[6];
+            deck[6] = card;
+        } else {
+        if (0 == s5) {
+            deck[i] = deck[5];
+            deck[5] = card;
+        } else {
+        if (0 == s4) {
+            deck[i] = deck[4];
+            deck[4] = card;
+        } else {
+        if (0 == s3) {
+            deck[i] = deck[3];
+            deck[3] = card;
+        } else {
+        if (0 == s2) {
+            deck[i] = deck[2];
+            deck[2] = card;
+        } else {
+        if (0 == s1) {
+            deck[i] = deck[1];
+            deck[1] = card;
+        } else {
+        if (0 == s0) {
+            deck[i] = deck[0];
+            deck[0] = card;
+        }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
     }
 
     return deck;
@@ -225,8 +294,8 @@ function CARD[num_cards] shuffleDeck(CARD seed[num_out_cards], CARD deck[num_car
 /*
  * Finalizing output by writing array to bits
  */
-function DECK finalizeDeck(CARD d[num_cards]) {
-    DECK deck = 0;
+function OUT_DECK finalizeDeck(CARD d[num_cards]) {
+    OUT_DECK deck = 0;
 
     for (CARD i = 0; i < num_out_cards; ++i) {
         deck = deck << card_size;
@@ -242,7 +311,6 @@ function void main() {
 
     CARD deck[num_cards];
     deck = initDeck(seed);
-
     deck = shuffleDeck(seed, deck);
 
     output1 = finalizeDeck(deck);
