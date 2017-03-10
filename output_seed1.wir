@@ -1,0 +1,3 @@
+function SEED seed1(SEED s1, SEED s2) {
+    return s1;
+}

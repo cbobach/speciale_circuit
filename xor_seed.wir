@@ -1,0 +1,3 @@
+function SEED xorSeed(SEED s1, SEED s2) {
+    return s1 ^ s2;
+}

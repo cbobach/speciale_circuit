@@ -1,0 +1,11 @@
+function DECK initDeck(SEED _) {
+    DECK deck;
+    uint card_pos;
+
+    for (uint i = 0; i < num_cards; ++i) {
+        card_pos = i * card_size;
+        deck{card_pos:card_size} = i{0:card_size};
+    }
+
+    return deck;
+}

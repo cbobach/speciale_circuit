@@ -1,0 +1,84 @@
+#define card_size 6
+#define num_cards 52
+#define num_out_cards 20
+#define seed_size (num_cards * (num_cards-num_out_cards) + (num_out_cards * num_out_cards))
+#define deck_size (card_size * num_cards)
+
+typedef uint_t 12 uint
+typedef uint_t 1 bool
+typedef uint_t seed_size SEED
+typedef uint_t card_size CARD
+typedef uint_t deck_size DECK
+
+#parties 2
+
+#input 1 SEED
+#output 1 DECK
+#input 2 SEED
+#output 2 DECK
+
+#include "xor_seed.wir"
+#include "init_deck.wir"
+
+
+function DECK shuffleDeck(DECK deck, SEED seed) {
+    bool s;
+    bool x;
+    bool y;
+    bool a_in;
+    bool a_out;
+
+    uint card1_pos;
+    uint card2_pos;
+
+    for (uint i = 0; i < 32; ++i) {
+        for (uint j = 0; j < num_cards - 1; ++j) {
+            s = seed{i*num_cards + j};
+
+            card1_pos = j * card_size;
+            card2_pos = (j + 1) * card_size;
+
+            for (uint k = 0; k < card_size; ++k) {
+                x = deck{card1_pos + k};
+                y = deck{card2_pos + k};
+
+                a_in = x ^ y;
+                a_out = s & a_in;
+
+                deck{card1_pos + k} = x ^ a_out;
+                deck{card2_pos + k} = y ^ a_out;
+            }
+        }
+    }
+
+
+    for (uint i = 0; i < 20; ++i) {
+        for (uint j = 0; j < 20 - 1; ++j) {
+            s = seed{i*num_cards + j};
+
+            card1_pos = j * card_size;
+            card2_pos = (j + 1) * card_size;
+
+            for (uint k = 0; k < card_size; ++k) {
+                x = deck{card1_pos + k};
+                y = deck{card2_pos + k};
+
+                a_in = x ^ y;
+                a_out = s & a_in;
+
+                deck{card1_pos + k} = x ^ a_out;
+                deck{card2_pos + k} = y ^ a_out;
+            }
+        }
+    }
+
+    return deck;
+}
+
+function void main() {
+    SEED seed = xorSeed(input1, input2);
+
+    DECK deck = initDeck(input1);
+
+    output1 = shuffleDeck(deck, seed);
+}

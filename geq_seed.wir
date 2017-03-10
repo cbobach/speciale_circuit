@@ -1,0 +1,47 @@
+function SEED geqSeed(SEED seed) {
+    uint card_pos;
+
+    bool b;
+
+    uint x;
+    uint y;
+    uint z;
+    uint tmp;
+    uint tmp2;
+    uint res;
+    uint res2;
+
+    uint carry;
+
+    for (uint i = 0; i < num_out_cards; ++i) {
+        card_pos = i * card_size;
+
+        x{0:card_size} = seed{card_pos:card_size};
+
+        tmp = (i ^ 63) + 1;
+        res = num_cards + tmp;
+        y{0:card_size} = res{0:card_size};
+
+        z = x & y ^ y;
+        b = z == 0;
+
+        tmp2 = (y ^ 63) + 1;
+        res2 = x ^ tmp2;
+        carry = x & tmp2;
+        for (uint j = 0; j < card_size; ++j) {
+            carry = carry << 1;
+            x = res2;
+            tmp2 = carry;
+            res2 = x ^ tmp2;
+            carry = x & tmp2;
+        }
+
+        if (b) {
+            seed{card_pos:card_size} = res2{0:card_size};
+        } else {
+            seed{card_pos:card_size} = seed{card_pos:card_size};
+        }
+    }
+
+    return seed;
+}

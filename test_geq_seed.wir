@@ -1,0 +1,22 @@
+#define card_size 6
+#define num_cards 52
+#define num_out_cards 20
+#define seed_size (card_size * num_out_cards)
+
+typedef uint_t 9 uint
+typedef uint_t 1 bool
+
+typedef uint_t seed_size SEED
+
+#parties 2
+
+#input 1 SEED
+#output 1 SEED
+#input 2 SEED
+#output 2 SEED
+
+#include "geq_seed.wir"
+
+function void main() {
+    output1 = geqSeed(input1);
+}

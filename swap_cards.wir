@@ -1,0 +1,8 @@
+function DECK swapCards(DECK deck, uint w1, uint w2) {
+    CARD card1 = deck{w1*card_size:card_size};
+
+    deck{w1:card_size} = deck{w2*card_size:card_size};
+    deck{w2:card_size} = card1;
+
+    return deck;
+}

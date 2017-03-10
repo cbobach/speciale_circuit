@@ -1,0 +1,22 @@
+#define card_size 6
+#define num_cards 52
+#define num_out_cards 20
+#define seed_size (card_size*num_out_cards)
+#define deck_size (card_size * num_cards)
+
+typedef uint_t 9 uint
+typedef uint_t seed_size SEED
+typedef uint_t deck_size DECK
+
+#parties 2
+
+#input 1 SEED
+#output 1 DECK
+#input 2 SEED
+#output 2 DECK
+
+#include "init_deck.wir"
+
+function void main() {
+    output1 = initDeck(input1);
+}
