@@ -1,0 +1,106 @@
+#define num_cards 52
+#define num_out_cards 20
+
+
+#define card_size 6
+#define deck_size 312 /* num_cards * card_size*/
+#define seed_secret_share_size 312 /* num_cards * card_size*/
+#define seed_shuffle_size 830
+#define seed_tag_size 0
+#define seed_size 1142 /* seed_secret_share_size + seed_shuffle_size + seed_tag_size */
+
+typedef uint_t 1 bit
+typedef uint_t 9 uint9
+
+typedef uint_t seed_size SEED
+typedef uint_t seed_shuffle_size SEED_SHUFFLE
+typedef uint_t seed_secret_share_size SEED_SECRET_SHARE
+typedef uint_t card_size CARD
+typedef uint_t deck_size DECK
+
+#parties 2
+
+#input 1 SEED
+#input 2 SEED
+#output 1 DECK
+#output 2 DECK
+
+#include "xor_seed.wir"
+#include "init_deck.wir"
+
+/*
+ * Getting input-wires for seed to shuffle function
+ */
+function SEED_SHUFFLE seedShuffle(SEED seed) {
+    return seed{0:seed_shuffle_size};
+}
+
+/*
+ * Shuffling sorted deck according to seed
+ */
+function DECK shuffleDeck(DECK deck, SEED_SHUFFLE seed) {
+    uint9 pos_i, pos_j, pos_s;
+    CARD card;
+    bit b;
+
+    for(uint9 i = 0; i < num_out_cards; ++i){
+        uint9 nc = num_cards;
+        uint9 one = 1;
+
+        for(uint9 j = nc - one; j != 0; --j){
+            pos_i = (j - one) * card_size;
+            pos_j = j * card_size;
+
+            pos_s = num_cards * i + (j - one);
+            if(seed{pos_s}) {
+                card = deck{pos_i:card_size};
+                deck{pos_i:card_size} = deck{pos_j:card_size};
+                deck{pos_j:card_size} = card;
+            }
+        }
+    }
+
+    return deck;
+}
+
+/*
+ * Getting input-wires for secret sharing of shuffling
+ */
+function SEED_SECRET_SHARE seedSecretShare(SEED seed) {
+    return seed{seed_shuffle_size: seed_secret_share_size};
+}
+
+/*
+ * Getting output-wires of secret share to party 1
+ */
+function DECK secretShareP1(DECK deck, SEED_SECRET_SHARE seed) {
+    return deck{0:deck_size} ^ seed{0:deck_size};
+}
+
+/*
+ * Getting output-wires of secret share to party 2
+ */
+function DECK secretShareP2(SEED_SECRET_SHARE seed) {
+    return seed{0:deck_size};
+}
+
+
+function void main() {
+    SEED seed;
+    seed = xorSeed(input1, input2);
+
+    SEED_SHUFFLE seed_shuffle;
+    seed_shuffle = seedShuffle(seed);
+
+    DECK deck;
+    deck = initDeck(deck);
+
+    SEED_SECRET_SHARE seed_secret_share;
+    seed_secret_share = seedSecretShare(seed);
+
+    DECK deck_shuffled;
+    deck_shuffled = shuffleDeck(deck, seed_shuffle);
+
+    output1 = secretShareP1(deck_shuffled, seed_secret_share);
+    output2 = secretShareP2(seed_secret_share);
+}
