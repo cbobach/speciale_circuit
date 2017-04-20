@@ -22,8 +22,8 @@ typedef uint_t deck_size DECK
 
 #input 1 SEED
 #input 2 SEED
-#output 1 DECK
-#output 2 DECK
+#output 1 SEED
+#output 2 SEED
 
 #include "xor_seed.wir"
 #include "init_deck.wir"
