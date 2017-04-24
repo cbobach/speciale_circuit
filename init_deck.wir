@@ -3,7 +3,7 @@ function DECK initDeck(DECK deck){
 
     for(uint9 i = 0; i < num_cards; ++i) {
         pos = i * card_size;
-        deck{pos:card_size} = i{0:card_size};
+        deck{pos:card_size} = i{0:card_size} + 1;
     }
 
     return deck;
