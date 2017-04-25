@@ -1,17 +1,20 @@
 function SEED correctSeeds(SEED s1, SEED s2) {
     SEED s;
-    uint9 tmp1, tmp2, tmp3, tmp4;
-    uint9 pos;
+    uint9 tmp1, tmp2;
+    int10 tmp3, tmp4, tmp5, pos;
 
-    for (uint9 i = 0; i < num_out_cards; ++i) {
+    for (int10 i = 0; i < num_out_cards; ++i) {
         pos = i * card_size;
         tmp1{0:card_size} = s1{pos:card_size};
         tmp2{0:card_size} = s2{pos:card_size};
-        tmp3 = tmp1 + tmp2;
+        tmp3{0:9} = tmp1 + tmp2;
 
-        tmp4 = tmp3 % (num_cards - i);
+        tmp4 = num_cards - i;
+        if (tmp3 > tmp4) {
+           tmp5 = tmp3 - tmp4;
+        }
 
-        s{pos:card_size} = tmp4{0:card_size};
+        s{pos:card_size} = tmp5{0:card_size};
     }
 
     return s;

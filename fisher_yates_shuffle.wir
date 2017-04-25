@@ -2,6 +2,8 @@
 #define num_cards 52
 #define num_out_cards 20
 
+typedef int_t 10 int10
+
 typedef uint_t 1 bit
 typedef uint_t 9 uint9
 typedef uint_t 120 SEED
