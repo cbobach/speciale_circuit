@@ -1,11 +1,3 @@
 function SEED xorSeed(SEED s1, SEED s2) {
     return s1 ^ s2;
 }
-
-function SEED seed1(SEED s1, SEED s2) {
-    return s1;
-}
-
-function SEED seed2(SEED s1, SEED s2) {
-    return s2;
-}
