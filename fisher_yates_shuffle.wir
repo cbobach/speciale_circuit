@@ -20,6 +20,9 @@ typedef uint_t 312 DECK
 #include "corrected_seed.wir"
 #include "init_deck.wir"
 
+/*
+ * Shuffling sorted deck according to corrected seed
+ */
 function DECK shuffleDeck(DECK deck, SEED seed) {
     uint9 pos_i;
     uint9 pos_j;
@@ -27,12 +30,18 @@ function DECK shuffleDeck(DECK deck, SEED seed) {
     CARD card;
     bit b;
 
+    /*
+     * Generating 'composed' gadget for swap on index
+     */
     for (uint9 i = 0; i < num_out_cards; ++i) {
         pos_i = i * card_size;
         s{0:card_size} = seed{pos_i:card_size};
 
         card = deck{pos_i:card_size};
 
+        /*
+         * Generating 'conditional swap' gadget for each 'composed' gadget
+         */
         for(uint9 j = i; j < num_cards; ++j) {
             pos_j = j * card_size;
 

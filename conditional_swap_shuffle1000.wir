@@ -1,6 +1,6 @@
 #define num_cards 52
 #define num_out_cards 20
-#define n_exec 1
+#define n_exec 1000
 
 #define card_size 6
 #define deck_size 312 /* num_cards * card_size*/

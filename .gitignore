@@ -1,3 +1,17 @@
-*
-test*.wir
+*wir.*
+*wir_*
+
+*test*
+*make*
+*Make*
+
+circuit*
+output*
+add_seed.wir
+geq_seed.wir
+mod_seed.wir
+swap_cards.wir
+
+*/
+
 !include *.wir
