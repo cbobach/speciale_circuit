@@ -1,0 +1,80 @@
+#define num_cards 52
+#define num_out_cards 20
+#define n_exec 1
+
+#define card_size 6
+#define deck_size 312 /* num_cards * card_size*/
+#define seed_size 830 /* seed_secret_share_size + seed_shuffle_size + seed_tag_size */
+
+typedef uint_t 1 bit
+typedef uint_t 9 uint9
+typedef uint_t 16 uint16
+
+typedef uint_t seed_size SEED
+typedef uint_t card_size CARD
+typedef uint_t deck_size DECK
+
+typedef struct_t p_seed {
+  SEED a[n_exec];
+}
+
+typedef struct_t p_deck {
+  DECK a[n_exec];
+}
+
+#parties 2
+
+#input 1 p_seed
+#input 2 p_seed
+
+#output 1 p_deck
+#output 2 p_deck
+
+#include "xor_seed.wir"
+#include "init_deck.wir"
+
+/*
+ * Shuffling sorted deck according to seed
+ */
+function DECK shuffleDeck(DECK deck, SEED seed) {
+  uint9 pos_i, pos_j, pos_s;
+  CARD card;
+  bit b;
+
+  /*
+   * Generating layers in the sorting network
+   */
+  for(uint9 i = 0; i < num_out_cards; ++i){
+    uint9 nc = num_cards;
+    uint9 one = 1;
+
+    /*
+     * Generating 'conditional swap' gadgets in each layer
+     */
+    for(uint9 j = nc - one; j != 0; --j){
+      pos_i = (j - one) * card_size;
+      pos_j = j * card_size;
+
+      pos_s = num_cards * i + (j - one);
+      if(seed{pos_s}) {
+        card = deck{pos_i:card_size};
+        deck{pos_i:card_size} = deck{pos_j:card_size};
+        deck{pos_j:card_size} = card;
+      }
+    }
+  }
+
+  return deck;
+}
+
+
+function void main() {
+  p_seed seed;
+  DECK deck;
+  deck = initDeck(deck);
+
+  for (uint16 k = 0; k < n_exec; ++k) {
+    seed.a[k] = xorSeed(input1.a[k], input2.a[k]);
+    output1.a[k] = shuffleDeck(deck, seed.a[k]);
+  }
+}
